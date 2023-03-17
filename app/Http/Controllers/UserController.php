@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -15,14 +16,13 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed'
         ]);
-        $password = Hash::make(request('password'));
-        $credentials = [
+
+        $user = User::create([
             'name' => request('name'),
             'email' => request('email'),
-            'password' => $password
-        ];
+            'password' => Hash::make(request('password')),
+        ]);
 
-        $user = User::create($credentials);
 
         if(!$user) {
             return response()->json([
@@ -36,6 +36,35 @@ class UserController extends Controller
             'message' => 'User created successfully'
         ], 201);
     }
-}
 
- 
+
+public function update(Request $request, User $user)
+{
+    $data =[];
+
+    if($request->input('password')){
+        $data['password']= $request->input('password');
+    }
+    if($request->input('name')){
+        $data['name']= $request->input('name');
+    }
+    if($request->input('email')){
+        $data['email']= $request->input('email');
+    }
+
+    $user = JWTAuth::user();
+
+     try {
+        $user->where('id', $user->id)->update($data);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+
+    // $user->users()->sync($user);
+
+    return response()->json([
+        'success'=>'user has been update',
+        'data' => ['user' => $user]
+    ], 201);
+}
+}
