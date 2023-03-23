@@ -17,7 +17,7 @@ use App\Http\Controllers\UserController;
 */
 Route::group([
 
-    'middleware' => 'api',
+
     'prefix' => 'auth'
 
 ], function ($router) {
@@ -32,5 +32,8 @@ Route::apiResource('profile',UserController::class);
 
 Route::post('register', [UserController::class,'register']);
 
+Route::post('forgot',[AuthController::class,'forgot_password']);
+Route::post('reset-password',[AuthController::class,'reset_password'] );
+Route::get('/reset-password/{token}', function(string $token){return $token;})->name('password.reset');
 
 

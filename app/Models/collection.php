@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class collection extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+    ];
+
     function livre(){
         return $this->hasMany(Livre::class);
     }
