@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\UserController;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,29 +15,55 @@ use App\Http\Controllers\UserController;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
 Route::group([
 
-
+    'middleware' => 'api',
     'prefix' => 'auth'
 
 ], function ($router) {
 
-    Route::post('login', [AuthController::class,'login']);
-    Route::post('logout', [AuthController::class,'logout']);
-    Route::post('refresh', [AuthController::class,'refresh']);
-    Route::post('me', [AuthController::class,'me']);
+    Route::post('login',    [AuthController::class, 'login'     ]);
+    Route::post('register', [AuthController::class, 'register'  ]);
+    Route::post('logout',   [AuthController::class, 'logout'    ]);
+    Route::post('refresh',  [AuthController::class, 'refresh'   ]);
+    Route::get('me',        [AuthController::class, 'me'        ]);
+    Route::post('logout',   [AuthController::class, 'logout'    ]);
+    Route::post('updateProfile',   [AuthController::class, 'updateProfile'    ]);
+
+    Route::get('book/{request}',[UserController::class,'show'] );
+    Route::get('book/',[UserController::class,'index'] );
 });
 
-Route::apiResource('profile',UserController::class);
-
-Route::post('register', [UserController::class,'register']);
 
 Route::post('forgot',[AuthController::class,'forgot_password']);
-Route::post('reset-password',[AuthController::class,'reset_password'] );
+Route::patch('reset-password',[AuthController::class,'reset_password'] );
 Route::get('/reset-password/{token}', function(string $token){return $token;})->name('password.reset');
 
 
+Route::group([
+
+    'middleware' => ['api', 'rec'],
+    'prefix' => 'rec',
+
+], function () {
+Route::apiResource('book',BookController::class);
+});
+
+Route::group([
+    'middleware' => ['api', 'isAdmin'],
+    'prefix' => 'admin',
+],function(){
+    Route::apiResource('genre',GenreController::class);
+    Route::patch('update-book/{id}',[AdminController::class , 'update']);
+    Route::delete('destroy-book/{id}',[AdminController::class , 'destroy']);
+    Route::post('role-change/{id}',[AdminController::class , 'roleChange']);
+});

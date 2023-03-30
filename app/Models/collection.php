@@ -5,15 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class collection extends Model
+class Collection extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'name',
     ];
+    protected $hidden = [
+        'id',
+        'created_at',
+        'updated_at'
+    ];
 
-    function livre(){
-        return $this->hasMany(Livre::class);
+    public function book(){
+        return $this->hasMany(Book::class);
     }
 }

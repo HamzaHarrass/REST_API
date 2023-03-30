@@ -5,9 +5,11 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+// use Illuminate\Routing\Controllers\Middleware;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use APP\Http\Middleware\receptionist as middleware;
 
-class isUser
+class receptionist 
 {
     /**
      * Handle an incoming request.
@@ -20,7 +22,7 @@ class isUser
     {
         $user = JWTAuth::user();
         $role = User::with(['role'])->find($user->id);
-        if($role->role->name === 'user'){
+        if($role->role->name === 'receptionist'){
             
             return $next($request);
         }else{
@@ -29,5 +31,6 @@ class isUser
                 'message' => 'Unauthorized',
             ], 401);
         }
+        
     }
 }

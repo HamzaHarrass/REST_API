@@ -8,13 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'name',
     ];
-    
-    public function users()
-    {
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
+
+
+
+
+    // protected $hidden =['pivot'];
+
+    public function user(){
         return $this->hasMany(User::class);
     }
 }
